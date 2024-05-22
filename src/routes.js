@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 const {
   addBusinessInfoHandler,
   getBusinessInfoHandler,
-  updateBusinessInfoHandler,
-} = require("./business/handler");
+  editBusinessInfoHandler,
+} = require('./business/handler');
 
 const {
   addProductHandler,
@@ -12,47 +12,47 @@ const {
   getProductByIdHandler,
   editProductByIdHandler,
   deleteProductByIdHandler,
-} = require("./product/handler");
+} = require('./product/handler');
 
 const routes = [
   {
-    method: "POST",
-    path: "/business",
+    method: 'POST',
+    path: '/business',
     handler: addBusinessInfoHandler,
   },
   {
-    method: "GET",
-    path: "/business/{businessId}",
+    method: 'GET',
+    path: '/business/{businessId}',
     handler: getBusinessInfoHandler,
   },
   {
-    method: "PUT",
-    path: "/business/{businessId}",
-    handler: updateBusinessInfoHandler,
+    method: 'PUT',
+    path: '/business/{businessId}',
+    handler: editBusinessInfoHandler,
   },
   {
-    method: "POST",
+    method: 'POST',
     path: "/business/product",
     handler: addProductHandler,
   },
   {
-    method: "GET",
-    path: "/business/product",
+    method: 'GET',
+    path: '/business/{businessId}/product',
     handler: getAllProductHandler,
   },
   {
-    method: "GET",
-    path: "/business/product/{productId}",
+    method: 'GET',
+    path: '/business/{businessId}/product/{productId}',
     handler: getProductByIdHandler,
   },
   {
-    method: "PUT",
-    path: "/business/product/{productId}",
+    method: 'PUT',
+    path: '/business/{businessId}/product/{productId}',
     handler: editProductByIdHandler,
   },
   {
     method: "DELETE",
-    path: "/business/product/{productId}",
+    path: '/business/{businessId}/product/{productId}',
     handler: deleteProductByIdHandler,
   },
 

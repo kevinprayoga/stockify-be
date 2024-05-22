@@ -45,8 +45,8 @@ const getKey = async (header, callback) => {
 const authenticate = async (request, h) => {
   const headers = request.headers;
   try {
-    const clerkToken = headers.authorization.replace("Bearer ", "");
-    console.log("Token received:", clerkToken);
+    const clerkToken = headers.authorization.replace('Bearer ', '');
+    console.log('Token received: ', clerkToken);
 
     const decoded = await new Promise((resolve, reject) => {
       jwt.verify(clerkToken, getKey, { algorithms: ['RS256'] }, (err, decoded) => {
@@ -63,8 +63,8 @@ const authenticate = async (request, h) => {
     request.user = decoded;
     return h.continue;
   } catch (error) {
-    console.log("Authentication error:", error.message);
-    return h.response({ error: "Unauthorized" }).code(401).takeover();
+    console.log('Authentication error: ', error.message);
+    return h.response({ error: 'Unauthorized' }).code(401).takeover();
   }
 };
 

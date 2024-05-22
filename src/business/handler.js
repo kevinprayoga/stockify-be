@@ -1,17 +1,23 @@
-"use strict";
+'use strict';
 
-const { nanoid } = require("nanoid");
-const { Timestamp, FieldValue, Filter } = require("firebase-admin/firestore");
+const { nanoid } = require('nanoid');
+const { Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 
-const db = require("../../db/firebaseConfig");
+const { db } = require('../../db/firebaseConfig');
 
 const addBusinessInfoHandler = async (request, h) => {
   let businessId = nanoid(16);
-  const { businessName, businessAddress, province, city, kecamatan, posCode } =
-    request.payload;
+  const {
+    businessName,
+    businessAddress,
+    province,
+    city,
+    kecamatan,
+    posCode
+  } = request.payload;
   const userID = request.user.sub;
-  const insertedAt = new Date().toISOString();
-  const updatedAt = insertedAt;
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
 
   const newBusiness = {
     businessId,
@@ -22,42 +28,42 @@ const addBusinessInfoHandler = async (request, h) => {
     kecamatan,
     posCode,
     userID,
-    insertedAt,
+    createdAt,
     updatedAt,
   };
 
   try {
     // Memeriksa apakah dokumen dengan ID yang dihasilkan sudah ada
-    while ((await db.collection("businessInfo").doc(businessId).get()).exists) {
+    while ((await db.collection('businessInfo').doc(businessId).get()).exists) {
       id = nanoid(16);
     }
 
-    if (!businessName || businessName === "") {
+    if (!businessName || businessName === '') {
       const response = h.response({
-        status: "failed",
-        message: "Gagal menambahkan data bisnis. Mohon isi nama bisnis Anda",
+        status: 'failed',
+        message: 'Gagal menambahkan data bisnis. Mohon isi nama bisnis Anda',
       });
       response.code(400);
       return response;
     }
 
-    const businessRef = db.collection("businessInfo").doc(businessId);
+    const businessRef = db.collection('businessInfo').doc(businessId);
     await businessRef.set(newBusiness);
 
     const isSuccess = await businessRef.get();
 
     if (!isSuccess.exists) {
       const response = h.response({
-        status: "failed",
-        message: "Informasi bisnis gagal ditambahkan",
+        status: 'failed',
+        message: 'Informasi bisnis gagal ditambahkan',
       });
       response.code(500);
       return response;
     }
 
     const response = h.response({
-      status: "success",
-      message: "Informasi bisnis berhasil ditambahkan",
+      status: 'success',
+      message: 'Informasi bisnis berhasil ditambahkan',
       data: {
         businessId,
       },
@@ -65,10 +71,10 @@ const addBusinessInfoHandler = async (request, h) => {
     response.code(201);
     return response;
   } catch (error) {
-    console.error("Error adding business info:", error);
+    console.error('Error adding business info: ', error);
     const response = h.response({
-      status: "error",
-      message: "Gagal menambahkan informasi bisnis",
+      status: 'error',
+      message: 'Gagal menambahkan informasi bisnis',
     });
     response.code(500);
     return response;
@@ -80,24 +86,23 @@ const getBusinessInfoHandler = async (request, h) => {
   const userID = request.user.sub;
 
   try {
-    const businessRef = db.collection("businessInfo").doc(businessId);
+    const businessRef = db.collection('businessInfo').doc(businessId);
     const doc = await businessRef.get();
 
     if (!doc.exists) {
       const response = h.response({
-        status: "failed",
-        message: "Informasi bisnis tidak ditemukan",
+        status: 'failed',
+        message: 'Informasi bisnis tidak ditemukan',
       });
       response.code(404);
       return response;
     }
 
-    // Memastikan bahwa pengguna yang mengupdate adalah pemilik dokumen
+    // Memastikan bahwa pengguna yang melakukan get adalah pemilik dokumen
     if (doc.data().userID !== userID) {
       const response = h.response({
-        status: "failed",
-        message:
-          "Anda tidak memiliki izin untuk mendapatkan informasi bisnis ini",
+        status: 'failed',
+        message: 'Anda tidak memiliki izin untuk mendapatkan informasi bisnis ini',
       });
       response.code(403);
       return response;
@@ -114,42 +119,50 @@ const getBusinessInfoHandler = async (request, h) => {
       kecamatan: data.kecamatan,
       posCode: data.posCode,
       userID: data.userID,
-      insertedAt: data.insertedAt,
+      createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
 
     const response = h.response({
-      status: "success",
+      status: 'success',
       data: responseData,
     });
     response.code(200);
     return response;
   } catch (error) {
-    console.error("Error getting business data:", error);
+    console.error('Error getting business data: ', error);
     const response = h.response({
-      status: "error",
-      message: "Gagal mendapatkan informasi bisnis",
+      status: 'error',
+      message: 'Gagal mendapatkan informasi bisnis',
     });
     response.code(500);
     return response;
   }
 };
 
-const updateBusinessInfoHandler = async (request, h) => {
+const editBusinessInfoHandler = async (request, h) => {
   const { businessId } = request.params;
   const userID = request.user.sub;
-  const { businessName, businessAddress, province, city, kecamatan, posCode } =
-    request.payload;
+
+  const {
+    businessName,
+    businessAddress,
+    province,
+    city,
+    kecamatan,
+    posCode,
+  } = request.payload;
+
   const updatedAt = new Date().toISOString();
 
   try {
-    const businessRef = db.collection("businessInfo").doc(businessId);
+    const businessRef = db.collection('businessInfo').doc(businessId);
     const doc = await businessRef.get();
 
     if (!doc.exists) {
       const response = h.response({
-        status: "failed",
-        message: "Informasi bisnis tidak ditemukan",
+        status: 'failed',
+        message: 'Informasi bisnis tidak ditemukan',
       });
       response.code(404);
       return response;
@@ -158,37 +171,36 @@ const updateBusinessInfoHandler = async (request, h) => {
     // Memastikan bahwa pengguna yang mengupdate adalah pemilik dokumen
     if (doc.data().userID !== userID) {
       const response = h.response({
-        status: "failed",
-        message:
-          "Anda tidak memiliki izin untuk mengupdate informasi bisnis ini",
+        status: 'failed',
+        message: 'Anda tidak memiliki izin untuk mengupdate informasi bisnis ini',
       });
       response.code(403);
       return response;
     }
 
-    const updatedBusiness = {
-      businessName,
-      businessAddress,
-      province,
-      city,
-      kecamatan,
-      posCode,
-      updatedAt,
-    };
+    const updatedBusiness = { updatedAt }; // Selalu perbarui updatedAt
+
+    // Hanya tambahkan atribut ke updatedBusiness jika ada di payload
+    if (businessName) updatedBusiness.businessName = businessName;
+    if (businessAddress) updatedBusiness.businessAddress = businessAddress;
+    if (province) updatedBusiness.province = province;
+    if (city) updatedBusiness.city = city;
+    if (kecamatan) updatedBusiness.kecamatan = kecamatan;
+    if (posCode) updatedBusiness.posCode = posCode;
 
     await businessRef.update(updatedBusiness);
 
     const response = h.response({
-      status: "success",
-      message: "Informasi bisnis berhasil diperbarui",
+      status: 'success',
+      message: 'Informasi bisnis berhasil diperbarui',
     });
     response.code(200);
     return response;
   } catch (error) {
-    console.error("Error updating business info:", error);
+    console.error('Error updating business info: ', error);
     const response = h.response({
-      status: "error",
-      message: "Gagal memperbarui informasi bisnis",
+      status: 'error',
+      message: 'Gagal memperbarui informasi bisnis',
     });
     response.code(500);
     return response;
@@ -198,5 +210,5 @@ const updateBusinessInfoHandler = async (request, h) => {
 module.exports = {
   addBusinessInfoHandler,
   getBusinessInfoHandler,
-  updateBusinessInfoHandler,
+  editBusinessInfoHandler,
 };
