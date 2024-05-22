@@ -1,24 +1,18 @@
 "use strict";
 
 const { nanoid } = require("nanoid");
-const { Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const { Timestamp, FieldValue, Filter } = require("firebase-admin/firestore");
 
-const db = require("../../firebaseConfig");
+const db = require("../../db/firebaseConfig");
 
 const addBusinessInfoHandler = async (request, h) => {
   let businessId = nanoid(16);
-  const {
-    businessName,
-    businessAddress,
-    province,
-    city,
-    kecamatan,
-    posCode
-  } = request.payload;
+  const { businessName, businessAddress, province, city, kecamatan, posCode } =
+    request.payload;
   const userID = request.user.sub;
   const insertedAt = new Date().toISOString();
   const updatedAt = insertedAt;
-  
+
   const newBusiness = {
     businessId,
     businessName,
@@ -31,7 +25,7 @@ const addBusinessInfoHandler = async (request, h) => {
     insertedAt,
     updatedAt,
   };
-  
+
   try {
     // Memeriksa apakah dokumen dengan ID yang dihasilkan sudah ada
     while ((await db.collection("businessInfo").doc(businessId).get()).exists) {
@@ -84,7 +78,7 @@ const addBusinessInfoHandler = async (request, h) => {
 const getBusinessInfoHandler = async (request, h) => {
   const { businessId } = request.params;
   const userID = request.user.sub;
-  
+
   try {
     const businessRef = db.collection("businessInfo").doc(businessId);
     const doc = await businessRef.get();
@@ -102,7 +96,8 @@ const getBusinessInfoHandler = async (request, h) => {
     if (doc.data().userID !== userID) {
       const response = h.response({
         status: "failed",
-        message: "Anda tidak memiliki izin untuk mendapatkan informasi bisnis ini",
+        message:
+          "Anda tidak memiliki izin untuk mendapatkan informasi bisnis ini",
       });
       response.code(403);
       return response;
@@ -122,7 +117,7 @@ const getBusinessInfoHandler = async (request, h) => {
       insertedAt: data.insertedAt,
       updatedAt: data.updatedAt,
     };
-    
+
     const response = h.response({
       status: "success",
       data: responseData,
@@ -141,16 +136,10 @@ const getBusinessInfoHandler = async (request, h) => {
 };
 
 const updateBusinessInfoHandler = async (request, h) => {
-  const { businessId } = request.params; 
+  const { businessId } = request.params;
   const userID = request.user.sub;
-  const {
-    businessName,
-    businessAddress,
-    province,
-    city,
-    kecamatan,
-    posCode
-  } = request.payload;
+  const { businessName, businessAddress, province, city, kecamatan, posCode } =
+    request.payload;
   const updatedAt = new Date().toISOString();
 
   try {
@@ -170,7 +159,8 @@ const updateBusinessInfoHandler = async (request, h) => {
     if (doc.data().userID !== userID) {
       const response = h.response({
         status: "failed",
-        message: "Anda tidak memiliki izin untuk mengupdate informasi bisnis ini",
+        message:
+          "Anda tidak memiliki izin untuk mengupdate informasi bisnis ini",
       });
       response.code(403);
       return response;
@@ -205,7 +195,7 @@ const updateBusinessInfoHandler = async (request, h) => {
   }
 };
 
-module.exports = { 
+module.exports = {
   addBusinessInfoHandler,
   getBusinessInfoHandler,
   updateBusinessInfoHandler,

@@ -1,9 +1,9 @@
 "use strict";
 
 const { nanoid } = require("nanoid");
-const { Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const { Timestamp, FieldValue, Filter } = require("firebase-admin/firestore");
 
-const db = require("../../firebaseConfig");
+const db = require("../../db/firebaseConfig");
 
 const addProductHandler = async (req, res) => {
 
@@ -22,7 +22,7 @@ const editProductByIdHandler = async (req, res) => {
 };
 
 const deleteProductByIdHandler = async (req, res) => {
-
+  
 };
 
 module.exports = {
