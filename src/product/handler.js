@@ -16,7 +16,7 @@ const generateNgrams = (text) => {
 }
 
 const addProductHandler = async (request, h) => {
-  const productId = nanoid(20);
+  let productId = nanoid(20);
   const {
     businessId,
     productName,
@@ -25,6 +25,14 @@ const addProductHandler = async (request, h) => {
     stock,
     image: imageUri,
   } = request.payload;
+
+  // Validasi payload
+  if (!businessId || !productName || !cost || !price || !stock || !imageUri) {
+    return h.response({
+      status: 'failed',
+      message: 'Gagal menambahkan data produk. Mohon isi field produk Anda dengan lengkap',
+    }).code(400);
+  }
 
   let image;
   console.log('imageUri:', imageUri);
@@ -61,35 +69,27 @@ const addProductHandler = async (request, h) => {
 
   const ngrams = generateNgrams(productName);
 
-  const newProduct = {
-    productId,
-    businessId,
-    productName,
-    cost,
-    price,
-    stock,
-    image,
-    createdAt,
-    updatedAt,
-    ngrams,
-  };
-
   try {
     // Memeriksa apakah dokumen dengan ID yang dihasilkan sudah ada
     while ((await db.collection('businessInfo').doc(businessId)
       .collection('product').doc(productId).get()).exists) {
-      id = nanoid(20);
+      productId = nanoid(20);
     }
 
-    if (!productName || productName === '') {
-      const response = h.response({
-        status: 'failed',
-        message: 'Gagal menambahkan produk. Mohon isi nama produk Anda',
-      });
-      response.code(400);
-      return response;
-    }
+    const newProduct = {
+      productId,
+      businessId,
+      productName,
+      cost,
+      price,
+      stock,
+      image,
+      createdAt,
+      updatedAt,
+      ngrams,
+    };
 
+    /** Proses menambahkan ke database */
     const productRef = db.collection('businessInfo').doc(businessId)
     .collection('product').doc(productId);
     await productRef.set(newProduct);
@@ -135,7 +135,7 @@ const getAllProductHandler = async (request, h) => {
     let products;
     /** Jika tidak ada queryName */
     if (!queryName) {
-      const productGet = await productRef.get();
+      const productGet = await productRef.orderBy('createdAt', 'desc').get();
       products = productGet.docs.map((doc) => {
         const data = doc.data();
         return {
@@ -180,7 +180,9 @@ const getAllProductHandler = async (request, h) => {
 
     const response = h.response({
       status: 'success',
-      data: products,
+      data: {
+        products,
+      },
     });
     response.code(200);
     return response;

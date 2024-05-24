@@ -2,8 +2,8 @@
 
 const {
   addBusinessInfoHandler,
-  getBusinessInfoHandler,
-  editBusinessInfoHandler,
+  getBusinessInfoByIdHandler,
+  editBusinessInfoByIdHandler,
 } = require('./business/handler');
 
 const {
@@ -14,6 +14,19 @@ const {
   deleteProductByIdHandler,
 } = require('./product/handler');
 
+const {
+  addTransactionItemHandler,
+  getTransactionItemUnOrderHandler,
+  getTransactionItemByIdHandler,
+  editTransactionItemByIdHandler,
+} = require('./transactionItem/handler');
+
+const {
+  addTransactionHandler,
+  getAllTransactionHandler,
+  getTransactionByIdHandler,
+} = require('./transaction/handler');
+
 const routes = [
   {
     method: 'POST',
@@ -23,12 +36,12 @@ const routes = [
   {
     method: 'GET',
     path: '/business/{businessId}',
-    handler: getBusinessInfoHandler,
+    handler: getBusinessInfoByIdHandler,
   },
   {
     method: 'PUT',
     path: '/business/{businessId}',
-    handler: editBusinessInfoHandler,
+    handler: editBusinessInfoByIdHandler,
   },
   {
     method: 'POST',
@@ -55,7 +68,41 @@ const routes = [
     path: '/business/{businessId}/product/{productId}',
     handler: deleteProductByIdHandler,
   },
-
+  {
+    method: 'POST',
+    path: "/business/transactionItem",
+    handler: addTransactionItemHandler,
+  },
+  {
+    method: 'GET',
+    path: '/business/{businessId}/transactionItem',
+    handler: getTransactionItemUnOrderHandler,
+  },
+  {
+    method: 'GET',
+    path: '/business/{businessId}/transactionItem/{transactionItemId}',
+    handler: getTransactionItemByIdHandler,
+  },
+  {
+    method: 'PUT',
+    path: '/business/{businessId}/transactionItem/{transactionItemId}',
+    handler: editTransactionItemByIdHandler,
+  },
+  {
+    method: 'POST',
+    path: "/business/transaction",
+    handler: addTransactionHandler,
+  },
+  {
+    method: 'GET',
+    path: '/business/{businessId}/transaction',
+    handler: getAllTransactionHandler,
+  },
+  {
+    method: 'GET',
+    path: '/business/{businessId}/transaction/{transactionId}',
+    handler: getTransactionByIdHandler,
+  },
 ];
 
 module.exports = routes;

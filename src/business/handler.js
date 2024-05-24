@@ -15,38 +15,39 @@ const addBusinessInfoHandler = async (request, h) => {
     kecamatan,
     posCode
   } = request.payload;
+
+  // Validasi payload
+  if (!businessName || !businessAddress || !province || !city || !kecamatan || !posCode) {
+    return h.response({
+      status: 'failed',
+      message: 'Gagal menambahkan data bisnis. Mohon isi field bisnis Anda dengan lengkap',
+    }).code(400);
+  }
+
   const userID = request.user.sub;
   const createdAt = new Date().toISOString();
   const updatedAt = createdAt;
 
-  const newBusiness = {
-    businessId,
-    businessName,
-    businessAddress,
-    province,
-    city,
-    kecamatan,
-    posCode,
-    userID,
-    createdAt,
-    updatedAt,
-  };
-
   try {
     // Memeriksa apakah dokumen dengan ID yang dihasilkan sudah ada
     while ((await db.collection('businessInfo').doc(businessId).get()).exists) {
-      id = nanoid(16);
+      businessId = nanoid(16);
     }
 
-    if (!businessName || businessName === '') {
-      const response = h.response({
-        status: 'failed',
-        message: 'Gagal menambahkan data bisnis. Mohon isi nama bisnis Anda',
-      });
-      response.code(400);
-      return response;
-    }
+    const newBusiness = {
+      businessId,
+      businessName,
+      businessAddress,
+      province,
+      city,
+      kecamatan,
+      posCode,
+      userID,
+      createdAt,
+      updatedAt,
+    };
 
+    /** Proses menambahkan ke database */
     const businessRef = db.collection('businessInfo').doc(businessId);
     await businessRef.set(newBusiness);
 
@@ -81,7 +82,7 @@ const addBusinessInfoHandler = async (request, h) => {
   }
 };
 
-const getBusinessInfoHandler = async (request, h) => {
+const getBusinessInfoByIdHandler = async (request, h) => {
   const { businessId } = request.params;
   const userID = request.user.sub;
 
@@ -140,7 +141,7 @@ const getBusinessInfoHandler = async (request, h) => {
   }
 };
 
-const editBusinessInfoHandler = async (request, h) => {
+const editBusinessInfoByIdHandler = async (request, h) => {
   const { businessId } = request.params;
   const userID = request.user.sub;
 
@@ -209,6 +210,6 @@ const editBusinessInfoHandler = async (request, h) => {
 
 module.exports = {
   addBusinessInfoHandler,
-  getBusinessInfoHandler,
-  editBusinessInfoHandler,
+  getBusinessInfoByIdHandler,
+  editBusinessInfoByIdHandler,
 };
