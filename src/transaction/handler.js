@@ -3,7 +3,7 @@
 const { nanoid } = require('nanoid');
 const { Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 
-const { db } = require('../../db/firebaseConfig');
+const { db } = require('../../config/firebaseConfig');
 
 const addTransactionHandler = async (request, h) => {
   let transactionId = nanoid(20);
