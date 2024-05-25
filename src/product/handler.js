@@ -80,6 +80,15 @@ const addProductHandler = async (request, h) => {
       transactionItemId = nanoid(20);
     }
 
+    if (await db.collection('businessInfo').doc(businessId).collection('product').where('productName', '==', productName).get().docs.length > 0) {
+      const response = h.response({
+        status: 'failed',
+        message: 'Produk sudah ada',
+      });
+      response.code(400);
+      return response;
+    }
+
     const newProduct = {
       productId,
       businessId,
