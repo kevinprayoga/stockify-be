@@ -35,7 +35,7 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/business/{businessId}',
+    path: '/business',
     handler: getBusinessInfoByIdHandler,
   },
   {

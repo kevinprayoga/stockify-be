@@ -79,51 +79,31 @@ const addBusinessInfoHandler = async (request, h) => {
 };
 
 const getBusinessInfoByIdHandler = async (request, h) => {
-  const { businessId } = request.params;
   const userID = request.user.sub;
 
   try {
-    const businessRef = db.collection("businessInfo").doc(businessId);
+    const businessRef = db.collection("businessInfo").where("userID", "==", userID);
     const doc = await businessRef.get();
 
-    if (!doc.exists) {
-      const response = h.response({
-        status: "failed",
-        message: "Informasi bisnis tidak ditemukan",
-      });
-      response.code(404);
-      return response;
-    }
-
-    // Memastikan bahwa pengguna yang melakukan get adalah pemilik dokumen
-    if (doc.data().userID !== userID) {
-      const response = h.response({
-        status: "failed",
-        message:
-          "Anda tidak memiliki izin untuk mendapatkan informasi bisnis ini",
-      });
-      response.code(403);
-      return response;
-    }
-
-    // Ekstrak data yang relevan
-    const data = doc.data();
-    const responseData = {
-      businessId: data.businessId,
-      businessName: data.businessName,
-      businessAddress: data.businessAddress,
-      province: data.province,
-      city: data.city,
-      kecamatan: data.kecamatan,
-      posCode: data.posCode,
-      userID: data.userID,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
+    const businessData = doc.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        businessId: data.businessId,
+        businessName: data.businessName,
+        businessAddress: data.businessAddress,
+        province: data.province,
+        city: data.city,
+        kecamatan: data.kecamatan,
+        posCode: data.posCode,
+        userID: data.userID,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
+    });
 
     const response = h.response({
       status: "success",
-      data: responseData,
+      data: businessData,
     });
     response.code(200);
     return response;

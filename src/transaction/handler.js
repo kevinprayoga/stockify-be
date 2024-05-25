@@ -111,9 +111,7 @@ const getAllTransactionHandler = async (request, h) => {
     
     const response = h.response({
       status: 'success',
-      data: {
-        transactions,
-      },
+      data: transactions,
     });
     response.code(200);
     return response;

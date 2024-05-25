@@ -67,10 +67,10 @@ const addProductHandler = async (request, h) => {
     response.code(500);
     return response;
   }
-
+  
   const createdAt = new Date().toISOString();
   const updatedAt = createdAt;
-
+  
   const ngrams = generateNgrams(productName);
 
   try {
@@ -80,7 +80,9 @@ const addProductHandler = async (request, h) => {
       transactionItemId = nanoid(20);
     }
 
-    if (await db.collection('businessInfo').doc(businessId).collection('product').where('productName', '==', productName).get().docs.length > 0) {
+    /** Memeriksa apakah produk sudah ada */
+    const querySnapshot = await db.collection('businessInfo').doc(businessId).collection('product').where('productName', '==', productName).get();
+    if (!querySnapshot.empty) {
       const response = h.response({
         status: 'failed',
         message: 'Produk sudah ada',
@@ -169,9 +171,7 @@ const getAllProductHandler = async (request, h) => {
 
       const response = h.response({
         status: "success",
-        data: {
-          products,
-        },
+        data: products,
       });
       response.code(200);
       return response;
@@ -198,9 +198,7 @@ const getAllProductHandler = async (request, h) => {
 
     const response = h.response({
       status: "success",
-      data: {
-        products,
-      },
+      data: products,
     });
     response.code(200);
     return response;
