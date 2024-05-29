@@ -40,17 +40,26 @@ const addProductHandler = async (request, h) => {
   console.log("imageUri:", imageUri);
 
   try {
-    const fetch = (await import("node-fetch")).default;
-    const resImage = await fetch(imageUri);
-    const arrayBuffer = await resImage.arrayBuffer();
-    const bobFile = Buffer.from(arrayBuffer);
+    let buffer;
+
+    // Jika imageUri adalah base64
+    if (imageUri.startsWith('data:image/')) {
+      const base64Data = imageUri.split(';base64,').pop();
+      buffer = Buffer.from(base64Data, 'base64');
+    } else {
+      // Jika imageUri adalah URL
+      const fetch = (await import("node-fetch")).default;
+      const resImage = await fetch(imageUri);
+      const arrayBuffer = await resImage.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+    }
 
     const fileName = "productImage/" + Date.now() + ".jpg";
     console.log("fileName:", fileName);
     const bucket = getStorage().bucket();
     const file = bucket.file(fileName);
 
-    await file.save(bobFile, {
+    await file.save(buffer, {
       metadata: { contentType: "image/jpeg" },
       public: true,
     });
