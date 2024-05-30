@@ -44,6 +44,13 @@ const getKey = async (header, callback) => {
 
 const authenticate = async (request, h) => {
   const headers = request.headers;
+  console.log('Headers received:', headers); // Log headers untuk debugging
+
+  if (!headers.authorization) {
+    console.log('Authorization header is missing');
+    return h.response({ error: 'Unauthorized' }).code(401).takeover();
+  }
+
   try {
     const clerkToken = headers.authorization.replace('Bearer ', '');
     console.log('Token received: ', clerkToken);
