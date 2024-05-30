@@ -23,57 +23,16 @@ const addProductHandler = async (request, h) => {
     cost,
     price,
     stock,
-    image: imageUri,
+    image,
   } = request.payload;
 
   // Validasi payload
-  if (!businessId || !productName || !cost || !price || !stock || !imageUri) {
+  if (!businessId || !productName || !cost || !price || !stock || !image) {
     const response = h.response({
       status: "failed",
       message: "Gagal menambahkan data produk. Mohon isi field produk Anda dengan lengkap",
     });
     response.code(400);
-    return response;
-  }
-
-  let image;
-  console.log("imageUri:", imageUri);
-
-  try {
-    let buffer;
-
-    // Jika imageUri adalah base64
-    if (imageUri.startsWith('data:image/')) {
-      const base64Data = imageUri.split(';base64,').pop();
-      buffer = Buffer.from(base64Data, 'base64');
-    } else {
-      // Jika imageUri adalah URL
-      const fetch = (await import("node-fetch")).default;
-      const resImage = await fetch(imageUri);
-      const arrayBuffer = await resImage.arrayBuffer();
-      buffer = Buffer.from(arrayBuffer);
-    }
-
-    const fileName = "productImage/" + Date.now() + ".jpg";
-    console.log("fileName:", fileName);
-    const bucket = getStorage().bucket();
-    const file = bucket.file(fileName);
-
-    await file.save(buffer, {
-      metadata: { contentType: "image/jpeg" },
-      public: true,
-    });
-    console.log("Uploaded a blob or file!");
-
-    image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-    console.log("Image URL:", image);
-  } catch (error) {
-    console.error("Error uploading product: ", error);
-    const response = h.response({
-      status: "error",
-      message: "Gagal mengupload produk",
-    });
-    response.code(500);
     return response;
   }
   
@@ -275,7 +234,7 @@ const getProductByIdHandler = async (request, h) => {
 
 const editProductByIdHandler = async (request, h) => {
   const { businessId, productId } = request.params;
-  const { productName, cost, price, stock, image: imageUri } = request.payload;
+  const { productName, cost, price, stock, image } = request.payload;
 
   const updatedAt = new Date().toISOString();
 
@@ -306,40 +265,7 @@ const editProductByIdHandler = async (request, h) => {
     if (cost) updatedProduct.cost = cost;
     if (price) updatedProduct.price = price;
     if (stock) updatedProduct.stock = stock;
-    if (imageUri) {
-      let image;
-      console.log("imageUri:", imageUri);
-
-      try {
-        const fetch = (await import("node-fetch")).default;
-        const resImage = await fetch(imageUri);
-        const arrayBuffer = await resImage.arrayBuffer();
-        const bobFile = Buffer.from(arrayBuffer);
-
-        const fileName = "productImage/" + Date.now() + ".jpg";
-        console.log("fileName:", fileName);
-        const bucket = getStorage().bucket();
-        const file = bucket.file(fileName);
-
-        await file.save(bobFile, {
-          metadata: { contentType: "image/jpeg" },
-          public: true,
-        });
-        console.log("Uploaded a blob or file!");
-
-        image = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-        console.log("Image URL:", image);
-      } catch (error) {
-        console.error("Error uploading image: ", error);
-        return h
-          .response({
-            status: "failed",
-            message: "Gagal mengupload gambar",
-          })
-          .code(500);
-      }
-      updatedProduct.image = image;
-    }
+    if (image) updatedProduct.image = image;
 
     await productRef.update(updatedProduct);
 
