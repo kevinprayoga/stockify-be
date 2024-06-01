@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
-const authenticate = require('./authenticate');
+// const authenticate = require('./authenticate');
 
 const init = async () => {
   const server = Hapi.server({
@@ -17,7 +17,7 @@ const init = async () => {
   });
 
   // Menggunakan middleware autentikasi
-  server.ext('onRequest', authenticate);
+  // server.ext('onRequest', authenticate);
 
   server.route(routes);
   await server.start();

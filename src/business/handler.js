@@ -7,11 +7,11 @@ const { db } = require("../../config/firebaseConfig");
 
 const addBusinessInfoHandler = async (request, h) => {
   let businessId = nanoid(16);
-  const { businessName, businessAddress, province, city, kecamatan, posCode } =
+  const { businessName, businessAddress, province, city, kecamatan, posCode, userId } =
     request.payload;
 
   // Validasi payload
-  if (!businessName || !businessAddress || !province || !city || !kecamatan || !posCode) {
+  if (!businessName || !businessAddress || !province || !city || !kecamatan || !posCode || !userId)  {
     const response = h.response({
       status: "failed",
       message: "Gagal menambahkan data bisnis. Mohon isi field bisnis Anda dengan lengkap",
@@ -20,7 +20,6 @@ const addBusinessInfoHandler = async (request, h) => {
     return response;
   }
 
-  const userID = request.user.sub;
   const createdAt = new Date().toISOString();
   const updatedAt = createdAt;
 
@@ -38,7 +37,7 @@ const addBusinessInfoHandler = async (request, h) => {
       city,
       kecamatan,
       posCode,
-      userID,
+      userId,
       createdAt,
       updatedAt,
     };
@@ -79,10 +78,10 @@ const addBusinessInfoHandler = async (request, h) => {
 };
 
 const getBusinessInfoByIdHandler = async (request, h) => {
-  const userID = request.user.sub;
+  const userId = request.params;
 
   try {
-    const businessRef = db.collection("businessInfo").where("userID", "==", userID);
+    const businessRef = db.collection("businessInfo").where("userID", "==", userId);
     const doc = await businessRef.get();
 
     const businessData = doc.docs.map((doc) => {
@@ -95,7 +94,7 @@ const getBusinessInfoByIdHandler = async (request, h) => {
         city: data.city,
         kecamatan: data.kecamatan,
         posCode: data.posCode,
-        userID: data.userID,
+        userId: data.userID,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
       };
@@ -120,7 +119,6 @@ const getBusinessInfoByIdHandler = async (request, h) => {
 
 const editBusinessInfoByIdHandler = async (request, h) => {
   const { businessId } = request.params;
-  const userID = request.user.sub;
 
   const { businessName, businessAddress, province, city, kecamatan, posCode } =
     request.payload;
@@ -137,17 +135,6 @@ const editBusinessInfoByIdHandler = async (request, h) => {
         message: "Informasi bisnis tidak ditemukan",
       });
       response.code(404);
-      return response;
-    }
-
-    // Memastikan bahwa pengguna yang mengupdate adalah pemilik dokumen
-    if (doc.data().userID !== userID) {
-      const response = h.response({
-        status: "failed",
-        message:
-          "Anda tidak memiliki izin untuk mengupdate informasi bisnis ini",
-      });
-      response.code(403);
       return response;
     }
 

@@ -44,7 +44,13 @@ const getKey = async (header, callback) => {
 
 const authenticate = async (request, h) => {
   const headers = request.headers;
-  console.log('Headers received:', headers); // Log headers untuk debugging
+  console.log('Request path:', request.path); // Log request path untuk debugging
+
+  // Add exception for certain routes
+  const publicRoutes = ['/', '/status']; // List of public routes
+  if (publicRoutes.includes(request.path)) {
+    return h.continue;
+  }
 
   if (!headers.authorization) {
     console.log('Authorization header is missing');
