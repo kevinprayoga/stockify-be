@@ -7,11 +7,11 @@ const { db } = require("../../config/firebaseConfig");
 
 const addBusinessInfoHandler = async (request, h) => {
   let businessId = nanoid(16);
-  const { businessName, businessAddress, province, city, kecamatan, posCode, userId } =
+  const { businessName, businessAddress, province, city, kecamatan, posCode, userID } =
     request.payload;
 
   // Validasi payload
-  if (!businessName || !businessAddress || !province || !city || !kecamatan || !posCode || !userId)  {
+  if (!businessName || !businessAddress || !province || !city || !kecamatan || !posCode || !userID)  {
     const response = h.response({
       status: "failed",
       message: "Gagal menambahkan data bisnis. Mohon isi field bisnis Anda dengan lengkap",
@@ -37,7 +37,7 @@ const addBusinessInfoHandler = async (request, h) => {
       city,
       kecamatan,
       posCode,
-      userId,
+      userID,
       createdAt,
       updatedAt,
     };
@@ -78,10 +78,10 @@ const addBusinessInfoHandler = async (request, h) => {
 };
 
 const getBusinessInfoByIdHandler = async (request, h) => {
-  const userId = request.params;
+  const { userID } = request.params;
 
   try {
-    const businessRef = db.collection("businessInfo").where("userID", "==", userId);
+    const businessRef = db.collection("businessInfo").where("userID", "==", userID);
     const doc = await businessRef.get();
 
     const businessData = doc.docs.map((doc) => {
@@ -94,7 +94,7 @@ const getBusinessInfoByIdHandler = async (request, h) => {
         city: data.city,
         kecamatan: data.kecamatan,
         posCode: data.posCode,
-        userId: data.userID,
+        userID: data.userID,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
       };

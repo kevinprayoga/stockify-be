@@ -29,13 +29,20 @@ const {
 
 const routes = [
   {
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+      return h.response({ message: 'Welcome to the API!' }).code(200);
+    },
+  },
+  {
     method: 'POST',
     path: '/business',
     handler: addBusinessInfoHandler,
   },
   {
     method: 'GET',
-    path: '/business/{userId}',
+    path: '/business/{userID}',
     handler: getBusinessInfoByIdHandler,
   },
   {
