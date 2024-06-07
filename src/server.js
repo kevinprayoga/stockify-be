@@ -6,16 +6,22 @@ const routes = require('./routes');
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT || 8080,
-    // host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
-    host: process.env.NODE_ENV = '0.0.0.0',
+    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
     routes: {
       cors: {
         origin: ['*'],
+        additionalHeaders: ['Authorization', 'Content-Type']
       },
     },
   });
 
   server.route(routes);
+
+  server.ext('onRequest', (request, h) => {
+    console.log(`Request received: ${request.method.toUpperCase()} ${request.path}`);
+    return h.continue;
+  });
+
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
