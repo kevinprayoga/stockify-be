@@ -264,7 +264,7 @@ const editProductByIdHandler = async (request, h) => {
     }
     if (cost) updatedProduct.cost = cost;
     if (price) updatedProduct.price = price;
-    if (stock) updatedProduct.stock = stock;
+    if (typeof stock !== 'undefined') updatedProduct.stock = stock;
     if (image) updatedProduct.image = image;
 
     await productRef.update(updatedProduct);
