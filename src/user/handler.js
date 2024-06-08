@@ -20,6 +20,16 @@ const addUserHandler = async (request, h) => {
 
   const createdAt = new Date().toISOString();
 
+  const userCheck = await db.collection("user").doc(userID).get();
+  if (userCheck.exists) {
+    const response = h.response({
+      status: "failed",
+      message: "Gagal menambahkan user. ID user sudah ada",
+    });
+    response.code(400);
+    return response;
+  }
+
   try {
     const newUser = {
       userID,
