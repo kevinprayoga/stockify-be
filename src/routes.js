@@ -1,5 +1,7 @@
 'use strict';
 
+const { addUserHandler, getUserByIdHandler } = require('./user/handler');
+
 const {
   addBusinessInfoHandler,
   getBusinessInfoByIdHandler,
@@ -34,6 +36,16 @@ const routes = [
     handler: (request, h) => {
       return h.response({ message: 'Welcome to the API!' }).code(200);
     },
+  },
+  {
+    method: 'POST',
+    path: '/user',
+    handler: addUserHandler,
+  },
+  {
+    method: 'GET',
+    path: '/user/{userID}',
+    handler: getUserByIdHandler,
   },
   {
     method: 'POST',
